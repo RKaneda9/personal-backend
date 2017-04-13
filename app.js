@@ -16,5 +16,5 @@ app.use('/contact', require('./controllers/contact'));
 app.use(            require('./controllers/index'));
 
 app.listen(constants.port, function () {
-	console.log(`Application started. Listening on port ${constants.port}.`);
+    console.log(`Application started. Listening on port ${constants.port}.`);
 });

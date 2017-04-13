@@ -1,7 +1,7 @@
 module.exports = {
     rand: length => Math.random().toString(36).substring(2, length || 25),
 
-	foreach: (array, callback) => {
+    foreach: (array, callback) => {
 
         if (!array) { return; }
 
@@ -31,11 +31,11 @@ module.exports = {
 
     map: (array, func) => {
 
-    	if (typeof array != 'object') { return []; }
+        if (typeof array != 'object') { return []; }
 
-    	var mapped, keys, val;
+        var mapped, keys, val;
 
-    	mapped = [];
+        mapped = [];
         keys   = Object.keys(array);
 
         for (var i = 0; i < keys.length; i++) {

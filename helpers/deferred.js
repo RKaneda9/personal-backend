@@ -1,154 +1,154 @@
 let log   = require('./logger'),
-	utils = require('./utils');
+    utils = require('./utils');
 
 const deferredState = {
-	pending : 'pending',
-	resolved: 'resolved',
-	rejected: 'rejected'
+    pending : 'pending',
+    resolved: 'resolved',
+    rejected: 'rejected'
 };
 
 const handlerTypes = {
-	fail: 0,
-	done: 1,
-	then: 2
+    fail: 0,
+    done: 1,
+    then: 2
 }
 
 const helper = {
-	executeHandlers: (handlers, state, args) => {
+    executeHandlers: (handlers, state, args) => {
 
-		if (state === deferredState.pending) { return; }
+        if (state === deferredState.pending) { return; }
 
-		let params;
+        let params;
 
-		try {
-			utils.foreach(handlers, (handler) => {
+        try {
+            utils.foreach(handlers, (handler) => {
 
-				if (state === deferredState.resolved) {
-					switch (handler.type) {
+                if (state === deferredState.resolved) {
+                    switch (handler.type) {
 
-						case handlerTypes.done:
-							handler.cb.execute(args);
-							break;
+                        case handlerTypes.done:
+                            handler.cb.execute(args);
+                            break;
 
-						case handlerTypes.then:
-							params = handler.cb.execute(args);
-							handler.child.resolve.call(null, params);
-							break;
-					}
-				}
-				else if (state === deferredState.rejected) {
+                        case handlerTypes.then:
+                            params = handler.cb.execute(args);
+                            handler.child.resolve.call(null, params);
+                            break;
+                    }
+                }
+                else if (state === deferredState.rejected) {
 
-					switch (handler.type) {
+                    switch (handler.type) {
 
-						case handlerTypes.fail:
-							handler.cb.execute(args);
-							break;
+                        case handlerTypes.fail:
+                            handler.cb.execute(args);
+                            break;
 
-						case handlerTypes.then:
-							handler.child.reject.apply(null, args);
-							break;
-					}
-				}
-			});
-		}
-		catch (ex) { log.error(ex, args); }
-	},
+                        case handlerTypes.then:
+                            handler.child.reject.apply(null, args);
+                            break;
+                    }
+                }
+            });
+        }
+        catch (ex) { log.error(ex, args); }
+    },
 
-	addHandler: function (target, type, args, chainedDeferred) {
+    addHandler: function (target, type, args, chainedDeferred) {
 
-		if (typeof args[0] !== 'function') { return; }
+        if (typeof args[0] !== 'function') { return; }
 
-		var callback = new Callback(args[0], typeof args[1] === 'object' ? args[1] : null);
+        var callback = new Callback(args[0], typeof args[1] === 'object' ? args[1] : null);
 
-		target.push(new Handler(type, callback, chainedDeferred));
-	}
+        target.push(new Handler(type, callback, chainedDeferred));
+    }
 };
 
 class Handler {
 
-	constructor (type, callback, child) {
-		this.type  = type;
-		this.cb    = callback;
-		this.child = child;
-	}
+    constructor (type, callback, child) {
+        this.type  = type;
+        this.cb    = callback;
+        this.child = child;
+    }
 }
 
 class Callback {
 
-	constructor (func, ctx) {
-		this.func = func;
-		this.ctx  = typeof ctx === 'object' ? ctx : null;
-	}
+    constructor (func, ctx) {
+        this.func = func;
+        this.ctx  = typeof ctx === 'object' ? ctx : null;
+    }
 
-	execute (args) {
-		return this.func.apply(this.ctx, args);
-	}
+    execute (args) {
+        return this.func.apply(this.ctx, args);
+    }
 }
 
 function Deferred () {
 
-	let state, promise, handlers, resolve, reject, args;
+    let state, promise, handlers, resolve, reject, args;
 
-	state    = deferredState.pending;
-	handlers = [];
-	promise  = {
-		state: () => { return state; },
+    state    = deferredState.pending;
+    handlers = [];
+    promise  = {
+        state: () => { return state; },
 
-		done: function () {
-			helper.addHandler(handlers, handlerTypes.done, arguments);
+        done: function () {
+            helper.addHandler(handlers, handlerTypes.done, arguments);
 
-			if (state === deferredState.resolved) { resolve(); }
+            if (state === deferredState.resolved) { resolve(); }
 
-			return promise;
-		},
+            return promise;
+        },
 
-		fail: function () {
-			helper.addHandler(handlers, handlerTypes.fail, arguments);
+        fail: function () {
+            helper.addHandler(handlers, handlerTypes.fail, arguments);
 
-			if (state === deferredState.rejected) { reject(); }
+            if (state === deferredState.rejected) { reject(); }
 
-			return promise;
-		},
+            return promise;
+        },
 
-		then: function () {
-			let child = new Deferred();
+        then: function () {
+            let child = new Deferred();
 
-			helper.addHandler(handlers, handlerTypes.then, arguments);
+            helper.addHandler(handlers, handlerTypes.then, arguments);
 
-			return child.promise;
-		},
+            return child.promise;
+        },
 
-		always: function () {
-			promise.done.apply(null, arguments).fail.apply(null, arguments);
-			return promise;
-		}
-	};
+        always: function () {
+            promise.done.apply(null, arguments).fail.apply(null, arguments);
+            return promise;
+        }
+    };
 
-	resolve = function () {
-		state = deferredState.resolved;
-		args  = arguments.length ? arguments : args;
+    resolve = function () {
+        state = deferredState.resolved;
+        args  = arguments.length ? arguments : args;
 
-		let handlersCopy = handlers.splice(0, handlers.length);
+        let handlersCopy = handlers.splice(0, handlers.length);
 
-		helper.executeHandlers(handlersCopy, state, args);
+        helper.executeHandlers(handlersCopy, state, args);
 
-		return promise;
-	};
+        return promise;
+    };
 
-	reject = function () {
-		state = deferredState.rejected;
-		args  = arguments.length ? arguments : args;
+    reject = function () {
+        state = deferredState.rejected;
+        args  = arguments.length ? arguments : args;
 
-		let handlersCopy = handlers.splice(0, handlers.length);
+        let handlersCopy = handlers.splice(0, handlers.length);
 
-		helper.executeHandlers(handlersCopy, state, args);
-		
-		return promise;
-	};
+        helper.executeHandlers(handlersCopy, state, args);
+        
+        return promise;
+    };
 
-	this.promise = promise;
-	this.resolve = resolve;
-	this.reject  = reject;
+    this.promise = promise;
+    this.resolve = resolve;
+    this.reject  = reject;
 };
 
 module.exports = Deferred;
