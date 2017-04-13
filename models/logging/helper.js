@@ -7,9 +7,9 @@ let helper = {
 
     parseErrorArg: (err) => (
         {
-            type     : err.name,
+            type    : err.name,
             message : err.message,
-            stack      : err.stack
+            stack   : err.stack
         }
     ),
 

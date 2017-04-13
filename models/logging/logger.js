@@ -8,13 +8,6 @@ let Entry     = require('./entry'),
     enums     = require('../../helpers/enums')    .logging,
     constants = require('../../helpers/constants').logging;
 
-// ensure all file paths exist.
-utils.foreach(constants.filePaths, (path) => { 
-    if (!fs.existsSync(path)) { 
-        fs.mkdirSync(path); 
-    }
-});
-
 class Logger {
 
     constructor(props) {
