@@ -1,8 +1,8 @@
 'use strict';
 
 let http      = require('http'),
-	express   = require('express'),
-	parser    = require('body-parser'),
+    express   = require('express'),
+    parser    = require('body-parser'),
     constants = require('./helpers/constants'),
     mailer    = require('./helpers/mailer'),
     app       = express();
