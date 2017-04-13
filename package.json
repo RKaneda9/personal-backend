@@ -2,9 +2,10 @@
   "name": "kaneda",
   "version": "1.0.0",
   "description": "Personal Website for Raiden Kaneda",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {},
   "author": "Raiden Kaneda",
+  "homepage": "http://www.raidenkaneda.com",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.2",
