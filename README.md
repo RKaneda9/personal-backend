@@ -29,3 +29,10 @@ This file contains the settings for the mailer located at `/helpers/mailer.js`. 
     "port": 465
 }
 ```
+
+## Application Setup and Startup
+
+From a terminal run:
+1. npm i
+2. npm start
+
