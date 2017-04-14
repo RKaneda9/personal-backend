@@ -1,5 +1,6 @@
 database/
 node_modules/
-public/*
+public/*.html
+public/*/
 *.log
 mailer.json
