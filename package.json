@@ -6,6 +6,10 @@
   "scripts": {},
   "author": "Raiden Kaneda",
   "homepage": "http://www.raidenkaneda.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RKaneda9/personal-backend.git"
+  },
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.2",
