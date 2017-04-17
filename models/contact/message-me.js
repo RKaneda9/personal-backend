@@ -62,10 +62,10 @@ Message: ${this.message}`;
 
     static validate (data) {
 
-        var response = Mail.validateStructure(data);
+        var response = MessageMe.validateStructure(data);
 
         if (!response.isValid) { return response; }
 
-        return Mail.validateData(data);
+        return MessageMe.validateData(data);
     }
 }
