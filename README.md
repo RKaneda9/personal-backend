@@ -24,7 +24,7 @@ This file contains the settings for the mailer located at `/helpers/mailer.js`. 
 {
     "toAddress": "example@gmail.com",
     "fromAddress": "noreply.example@gmail.com",
-    "fromPassword": "asdfasdf",
+    "fromPassword": "abcdefgh",
     "host": "smtp.gmail.com",
     "port": 465
 }
