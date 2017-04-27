@@ -12,6 +12,8 @@ class Logger {
 
     constructor(props) {
 
+        this.flush = this.flush.bind(this);
+
         this.entries        = [];
         this.flushTimeoutId = null;
         this.lastFlushTime  = null;
@@ -37,16 +39,7 @@ class Logger {
     }
 
     flush() {
-
-        if (this.flushTimeoutId) { return; }
-
-        this.flushTimeoutId = setTimeout(() => {
-            
-            helper.saveEntries(this.entries, this.settings);
-            this.lastFlushTime  = new Date();
-            this.flushTimeoutId = null;
-            
-        }, constants.flushTimeout);
+        helper.saveEntries(this.entries, this.settings);
     }
 
     debug() { this.log(enums.levels.debug, 'DEBUG', arguments, console.log,   chalk.green      ); }
@@ -54,23 +47,22 @@ class Logger {
     warn () { this.log(enums.levels.warn,  'WARN',  arguments, console.warn,  chalk.bold.yellow); }
     error() { this.log(enums.levels.error, 'ERROR', arguments, console.error, chalk.red        ); }
 
-    log(level, prefix, args, logFunc, colorFunc) {
+    async log(level, prefix, args, logFunc, colorFunc) {
 
         let entry = new Entry(level, prefix, args, this.session);
 
         if (logFunc && this.settings.console.level >= level) {
-            let str = helper.formatEntryString(entry, true);
+            let str = helper.formatEntryString(entry, true, this.settings);
 
             logFunc(colorFunc ? colorFunc(str) : str);
         }
 
         this.entries.push(entry);
-        this.flush();
     }
 
     static newSession (session) { 
         return new Logger({ 
-            session: `${helper.getTimeStr()}-${session || utils.rand(10)}` 
+            session: `${session || utils.rand(10)}` 
         }); 
     }
 }

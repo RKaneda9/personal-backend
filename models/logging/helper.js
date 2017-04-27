@@ -63,8 +63,8 @@ let helper = {
         }, null, "\t");
     },
 
-    formatEntryString: (entry, indent) => {
-        let str = `${entry.prefix.toUpperCase()} ${helper.getTimeStr(entry.time)} `;
+    formatEntryString: (entry, indent, settings) => {
+        let str = `${entry.prefix.toUpperCase()} ${helper.getTimeStr(entry.time)} ${settings.session} `;
 
         if (indent) {
             return str + utils.map(entry.args, arg => {
@@ -117,10 +117,10 @@ let helper = {
         };
 
         let str = {
-            path: `${constants.filePaths.str}${nowStr}/`,
+            path: constants.filePaths.str,//`${constants.filePaths.str}${nowStr}/`,
             ext : constants.fileExt  .str,
             save: settings.save.str,
-            name: settings.session.split(':').join('-')
+            name: nowStr//settings.session.split(':').join('-')
         };
 
         if (raw.save > enums.levels.none) {
@@ -155,7 +155,7 @@ let helper = {
             str.entries = utils.map(entries, entry => {
 
                 if (str.save >= entry.level) {
-                    return `${prefix}${helper.formatEntryString(entry)}`;
+                    return `${prefix}${helper.formatEntryString(entry, null, settings)}`;
                 }
 
             }).join('\n') + '\n';

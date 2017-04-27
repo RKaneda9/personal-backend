@@ -34,7 +34,9 @@ utils.foreach(constants.logging.filePaths, function (path) {
 
 module.exports = (req, res, next) => {
 
-    let log = Logger.newSession();
+    let log  = Logger.newSession(),
+        json = res.json,
+        send = res.send;
 
     log.debug(`${req.protocol}://${req.hostname}${port}${req.path}`, req.method, {
         ip:    req.ip,
@@ -44,6 +46,41 @@ module.exports = (req, res, next) => {
         route: req.route
     });
 
-    req.log = log;
+    req.log  = log;
+    res.json = function (data) {
+        json.apply(res, arguments);
+
+        setTimeout(() => {
+
+            log.info ('Response: ', res.statusCode, data);
+            log.flush();
+            delete log;
+        });
+    };
+
+    res.send = function (data) {
+        send.apply(res, arguments);
+
+        setTimeout(() => {
+            
+            log.info ('Response: ', res.statusCode, data);
+            log.flush();
+            delete log;
+        });
+    };
+
+    res.error = function (e, props) {
+        res
+            .status(status.serverError.internal)
+            .send  (props ? props.message : e.message);
+
+        setTimeout(() => {
+            
+            log.error(e, props);
+            log.flush();
+            delete log;
+        });
+    };
+
     next();
 };
