@@ -2,18 +2,18 @@ let express = require('express'),
     cors    = require('cors'),
     logging = require('../middleware/logging'),
     status  = require('../helpers/status-codes'),
-    log     = require('../helpers/logger'),
     router  = express.Router();
 
 router.use(cors()); // https://github.com/expressjs/cors
 router.use(logging);
 
-router.get('/ping', async (req, res) => {
-    res.status(status.success.ok).send('Still here!');
+router.get('/ping', (req, res) => {
+    res.status(status.success.noContent).send();
 });
 
-router.get('/log', async (req, res) => {
-    
+router.get('/log', (req, res) => {
+    // TODO:
+    res.status(status.success.ok).send();
 });
 
 module.exports = router;

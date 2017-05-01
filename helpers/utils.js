@@ -1,5 +1,7 @@
-module.exports = {
+let utils = module.exports = {
     rand: length => Math.random().toString(36).substring(2, length || 25),
+
+    pad: (val, length) => (("00000" + val).slice(-1 * (length || 2))),
 
     foreach: (array, callback) => {
 
@@ -61,5 +63,32 @@ module.exports = {
         }
 
         return mapped;
+    },
+
+    extend: (obj, props, override) => {
+        if (!props) { return; }
+
+        let keys = Object.keys(props),
+            i, val;
+
+        for (i = 0; i < keys.length; i++) {
+            val = props[keys[i]];
+
+            if (!override && obj[keys[i]]) { continue; }
+
+            switch (typeof val) {
+                case 'string':
+                case 'number':
+                case 'boolean':
+                    obj[keys[i]] = val;
+                    break;
+                case 'object':
+                case 'array':
+                    obj[keys[i]] = new val.constructor;
+                    utils.extend(obj[keys[i]], val);
+                    break;
+
+            }
+        }
     }
 };

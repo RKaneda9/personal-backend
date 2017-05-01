@@ -14,6 +14,6 @@ module.exports = {
             str: '.log'
         },
 
-        flushTimeout: 3000 // 15000
+        writeTimeout: 15000
     }
 };

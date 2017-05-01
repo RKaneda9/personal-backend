@@ -39,6 +39,5 @@ module.exports = {
         serviceUnavailable    : 503,
         gatewayTimeout        : 504,
         httpVersionNotSupporte: 505
-
     }
 };

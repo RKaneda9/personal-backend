@@ -1,27 +1,30 @@
 const utils = {
 
-    isArray   : (val) => { return val instanceof Array || val == null; },
-    isBoolean : (val) => { return typeof (val) === 'boolean'; },
-    isString  : (val) => { return typeof (val) === 'string' || val == null; },
-    isObject  : (val) => { return typeof (val) === 'object' && !(val instanceof Array); },
-    isInteger : (val) => { return typeof (val) === 'number' && parseInt  (val) == val.toString(); },
-    isFloat   : (val) => { return typeof (val) === 'number' && parseFloat(val) == val.toString(); },
+    isArray   : val => { return val instanceof Array || val == null; },
+    isBoolean : val => { return typeof val === 'boolean'; },
+    isString  : val => { return typeof val === 'string' || val == null; },
+    isObject  : val => { return typeof val === 'object' && !(val instanceof Array); },
+    isInteger : val => { return typeof val === 'number' && parseInt  (val) == val.toString(); },
+    isFloat   : val => { return typeof val === 'number' && parseFloat(val) == val.toString(); },
 
-    isPhoneNumber: (val) => {
+    isNotEmptyString: val => { return typeof val === 'string' && val.trim().length; },
+    isNotEmptyObject: val => { return typeof val === 'object' && val && !(val instanceof Array); },
+
+    isPhoneNumber: val => {
 
         return val
             && utils.isString(val)
             && /^(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}(?:\-?|\ ?))[2-9]\d{2}[- ]?\d{4}$/.test(val);
     },
 
-    isEmailAddress: (val) => {
+    isEmailAddress: val => {
 
         return val 
             && utils.isString(val)
             && /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val);
     },
 
-    isValidUrl : (val) => {
+    isValidUrl: val => {
         // TODO:
         return utils.isString(val);
     }
@@ -91,9 +94,7 @@ class Validate {
 
     check (data) { this.data = data; return this; }
 }
-
 const check = (data) => (new Validate(data));
-
 const trim  = (val, maxlength) => {
     val = val && utils.isString(val) ? val.trim() : val;
 
@@ -102,4 +103,4 @@ const trim  = (val, maxlength) => {
     return val;
 };
 
-module.exports = { check, trim };
+module.exports = { check, trim, utils };

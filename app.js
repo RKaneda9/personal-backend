@@ -3,11 +3,8 @@
 let express     = require('express'),
     parser      = require('body-parser'),
     constants   = require('./helpers/constants'),
-    mailer      = require('./helpers/mailer'),
     compression = require('compression'),
     app         = express();
-
-mailer.initialize();
 
 app.use(compression());
 app.use(parser.json());

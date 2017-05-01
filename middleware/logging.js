@@ -1,8 +1,8 @@
-let Logger    = require('../models/logging/logger'),
-    constants = require('../helpers/constants'),
-    utils     = require('../helpers/utils'),
-    fs        = require('fs'),
-    parser    = require('body-parser');
+let logService = require('../services/logger'),
+    constants  = require('../helpers/constants').logging,
+    utils      = require('../helpers/utils'),
+    fs         = require('fs'),
+    parser     = require('body-parser');
 
 let methods = {
     get:    "GET",
@@ -11,10 +11,11 @@ let methods = {
     delete: "DELETE"
 };
 
-let port = constants.port ? `:${constants.port}` : '';
+let port  = constants.port ? `:${constants.port}` : '';
+let flush = 200;
 
 // ensuring that all file paths exist.
-utils.foreach(constants.logging.filePaths, function (path) {
+utils.foreach(constants.filePaths, function (path) {
     let pieces   = path.split('/');
     let location = "";
 
@@ -34,53 +35,51 @@ utils.foreach(constants.logging.filePaths, function (path) {
 
 module.exports = (req, res, next) => {
 
-    let log  = Logger.newSession(),
-        json = res.json,
+    let json = res.json,
         send = res.send;
 
-    log.debug(`${req.protocol}://${req.hostname}${port}${req.path}`, req.method, {
+    req.log  = logService.newSession();
+
+    res.json = data => {
+        json.call(res, data);
+
+        setTimeout(() => {
+
+            req.log.info('Response: ', res.statusCode, data);
+            logService.flush(req.log);
+
+        }, flush);
+    };
+
+    res.send = data => {
+        send.call(res, data);
+
+        setTimeout(() => {
+            
+            req.log.info('Response: ', res.statusCode, data);
+            logService.flush(req.log);
+
+        }, flush);
+    };
+
+    res.error = (msg, e) => {
+        send.call(res, msg);
+
+        setTimeout(() => {
+            
+            req.log.error(msg, e);
+            logService.flush(req.log);
+
+        }, flush);
+    };
+
+    req.log.debug(`${req.protocol}://${req.hostname}${port}${req.path}`, req.method, {
         ip:    req.ip,
         body:  req.body,
         query: req.query,
         xhr:   req.xhr,
         route: req.route
     });
-
-    req.log  = log;
-    res.json = function (data) {
-        json.apply(res, arguments);
-
-        setTimeout(() => {
-
-            log.info ('Response: ', res.statusCode, data);
-            log.flush();
-            delete log;
-        });
-    };
-
-    res.send = function (data) {
-        send.apply(res, arguments);
-
-        setTimeout(() => {
-            
-            log.info ('Response: ', res.statusCode, data);
-            log.flush();
-            delete log;
-        });
-    };
-
-    res.error = function (e, props) {
-        res
-            .status(status.serverError.internal)
-            .send  (props ? props.message : e.message);
-
-        setTimeout(() => {
-            
-            log.error(e, props);
-            log.flush();
-            delete log;
-        });
-    };
 
     next();
 };
