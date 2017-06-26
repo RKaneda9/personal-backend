@@ -2,6 +2,7 @@ database/
 node_modules/
 public/*.html
 public/*/
+public/*.js
 tests/
 *.log
 settings.json
