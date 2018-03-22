@@ -28,7 +28,7 @@ utils.foreach(constants.filePaths, function (path) {
         location += location ? `/${piece}` : piece;
 
         if (!fs.existsSync(location)) {
-            fs.mkdirSync(location); 
+            fs.mkdirSync(location);
         }
     });
 });
@@ -55,7 +55,7 @@ module.exports = (req, res, next) => {
         send.call(res, data);
 
         setTimeout(() => {
-            
+
             req.log.info('Response: ', res.statusCode, data);
             logService.flush(req.log);
 
@@ -66,7 +66,7 @@ module.exports = (req, res, next) => {
         send.call(res, msg);
 
         setTimeout(() => {
-            
+
             req.log.error(msg, e);
             logService.flush(req.log);
 
@@ -74,11 +74,12 @@ module.exports = (req, res, next) => {
     };
 
     req.log.debug(`${req.protocol}://${req.hostname}${port}${req.path}`, req.method, {
-        ip:    req.ip,
-        body:  req.body,
-        query: req.query,
-        xhr:   req.xhr,
-        route: req.route
+        ip:      req.ip,
+        headers: { partner_id: req.get("partner_id") },
+        body:    req.body,
+        query:   req.query,
+        xhr:     req.xhr,
+        route:   req.route
     });
 
     next();
